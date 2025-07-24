@@ -1,7 +1,7 @@
 <!--
 index.html
 
-Version: 1.0
+Version: 1.0.1
 Last updated: 2025-07-24
 Author: Nabeel Syed
 -->
@@ -350,6 +350,8 @@ Author: Nabeel Syed
         let dpr = window.devicePixelRatio || 1;
         const ctx = canvas.getContext("2d");
         let particles = [];
+        let lastWidth = 0;
+        let lastHeight = 0;
 
         function getCanvasSize() {
           return {
@@ -358,15 +360,7 @@ Author: Nabeel Syed
           };
         }
 
-        function resizeCanvas() {
-          dpr = window.devicePixelRatio || 1;
-          const { width, height } = getCanvasSize();
-          canvas.width = width * dpr;
-          canvas.height = height * dpr;
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-          ctx.scale(dpr, dpr);
-
-          PARTICLE_COUNT = window.innerWidth < 600 ? 30 : 60;
+        function createParticles(width, height) {
           particles = [];
           for (let i = 0; i < PARTICLE_COUNT; i++) {
             particles.push({
@@ -380,12 +374,42 @@ Author: Nabeel Syed
           }
         }
 
-        resizeCanvas();
-        window.addEventListener("resize", resizeCanvas);
-        window.addEventListener("orientationchange", resizeCanvas);
+        function resizeCanvas(force = false) {
+          dpr = window.devicePixelRatio || 1;
+          const { width, height } = getCanvasSize();
+          // Only update if the size actually changed or forced, and avoid zero sizes
+          if (
+            (width === lastWidth && height === lastHeight && !force) ||
+            width === 0 ||
+            height === 0
+          )
+            return;
+          lastWidth = width;
+          lastHeight = height;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.scale(dpr, dpr);
+
+          PARTICLE_COUNT = window.innerWidth < 600 ? 30 : 60;
+          createParticles(width, height);
+        }
+
+        // Initial setup
+        resizeCanvas(true);
+
+        // Debounce resize events
+        let resizeTimeout;
+        function handleResize() {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => resizeCanvas(true), 100);
+        }
+        window.addEventListener("resize", handleResize);
+        window.addEventListener("orientationchange", handleResize);
 
         function animate() {
-          const { width, height } = getCanvasSize();
+          const width = lastWidth;
+          const height = lastHeight;
           ctx.clearRect(0, 0, width, height);
           for (let p of particles) {
             const fadeMargin = 40;
