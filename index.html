@@ -1,7 +1,7 @@
 <!--
 index.html
 
-Version: 1.0.1
+Version: 1.0.2
 Last updated: 2025-07-24
 Author: Nabeel Syed
 -->
@@ -352,6 +352,9 @@ Author: Nabeel Syed
         let particles = [];
         let lastWidth = 0;
         let lastHeight = 0;
+        let lastStableWidth = 0;
+        let lastStableHeight = 0;
+        let resizeTimeout;
 
         function getCanvasSize() {
           return {
@@ -396,13 +399,23 @@ Author: Nabeel Syed
         }
 
         // Initial setup
+        const { width, height } = getCanvasSize();
+        lastStableWidth = width;
+        lastStableHeight = height;
         resizeCanvas(true);
 
-        // Debounce resize events
-        let resizeTimeout;
+        // Debounced and stabilized resize events
         function handleResize() {
           clearTimeout(resizeTimeout);
-          resizeTimeout = setTimeout(() => resizeCanvas(true), 100);
+          resizeTimeout = setTimeout(() => {
+            const { width, height } = getCanvasSize();
+            // Only update if the size is different from the last stable size
+            if (width !== lastStableWidth || height !== lastStableHeight) {
+              lastStableWidth = width;
+              lastStableHeight = height;
+              resizeCanvas(true);
+            }
+          }, 300); // Wait longer to ensure bounce is done
         }
         window.addEventListener("resize", handleResize);
         window.addEventListener("orientationchange", handleResize);
