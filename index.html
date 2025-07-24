@@ -1,7 +1,7 @@
 <!--
 index.html
 
-Version: 1.0.2
+Version: 1.0.3
 Last updated: 2025-07-24
 Author: Nabeel Syed
 -->
@@ -81,6 +81,11 @@ Author: Nabeel Syed
           @media only screen and (min-width: 992px) {
             html {
               font-size: clamp(0.5rem, 1.5625vh, 1.115vw);
+            }
+          }
+          @media (max-width: 600px) {
+            .content-wrap--footer .caption-m.is--spaced {
+              font-size: 0.75rem !important;
             }
           }
           ::selection {
@@ -380,7 +385,6 @@ Author: Nabeel Syed
         function resizeCanvas(force = false) {
           dpr = window.devicePixelRatio || 1;
           const { width, height } = getCanvasSize();
-          // Only update if the size actually changed or forced, and avoid zero sizes
           if (
             (width === lastWidth && height === lastHeight && !force) ||
             width === 0 ||
@@ -398,24 +402,21 @@ Author: Nabeel Syed
           createParticles(width, height);
         }
 
-        // Initial setup
         const { width, height } = getCanvasSize();
         lastStableWidth = width;
         lastStableHeight = height;
         resizeCanvas(true);
 
-        // Debounced and stabilized resize events
         function handleResize() {
           clearTimeout(resizeTimeout);
           resizeTimeout = setTimeout(() => {
             const { width, height } = getCanvasSize();
-            // Only update if the size is different from the last stable size
             if (width !== lastStableWidth || height !== lastStableHeight) {
               lastStableWidth = width;
               lastStableHeight = height;
               resizeCanvas(true);
             }
-          }, 300); // Wait longer to ensure bounce is done
+          }, 300);
         }
         window.addEventListener("resize", handleResize);
         window.addEventListener("orientationchange", handleResize);
