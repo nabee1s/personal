@@ -1,7 +1,7 @@
 <!--
 index.html
 
-Version: 1.0.3
+Version: 1.0.4
 Last updated: 2025-07-24
 Author: Nabeel Syed
 -->
@@ -295,7 +295,7 @@ Author: Nabeel Syed
           <div class="w-layout-blockcontainer container w-container">
             <div class="content-wrap--footer">
               <div class="caption-m is--spaced" style="font-size: 0.8rem">
-                ©2025 Nabeel<br />All rights reserved
+                ©<span id="current-year"></span> Nabeel<br />All rights reserved
               </div>
             </div>
           </div>
@@ -497,6 +497,10 @@ Author: Nabeel Syed
           });
         });
       });
+    </script>
+    <script>
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
     </script>
   </body>
 </html>
